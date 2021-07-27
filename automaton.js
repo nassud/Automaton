@@ -12,6 +12,9 @@ const Automaton = {
     let stateName = STATE_INICIO;
     let state = graph[STATE_INICIO];
 
+    //Memoria de estados pasados para búsquedas sin orden
+    let charPath = [];
+
     const processChar = (char) => {
       const foundLink = state.links.find((link) => {
         const linkParts = link.split(":");
@@ -19,7 +22,8 @@ const Automaton = {
         return matches.indexOf(char) !== -1;
       });
 
-      if (foundLink) {
+      //Si el caracter encontrado ya estuvo en un estado anterior, ignoramos el link
+      if (foundLink && !charPath.includes(char)) {
         const linkParts = foundLink.split(":");
         const nextStateName = linkParts[1];
         const nextState = graph[nextStateName];
@@ -27,6 +31,7 @@ const Automaton = {
           `Encontrado link para ${char} en estado ${stateName} hacia estado ${nextStateName}`
         );
         stateName = nextStateName;
+        charPath = [...charPath, char];
         return nextState;
       }
       console.log(`No se encontró link para '${char}'! Ignorando caracter...`);
